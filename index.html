@@ -3,45 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>استطلاع رأي الخدمة - شركة الإنترنت</title>
+  <title>استطلاع رأي الخدمة - استبيان العملاء</title>
 
-  <!-- Tailwind CSS للديزاين السريع والعصري -->
+  <!-- Tailwind CSS للتنسيق العصري -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Firebase Web SDK (v9+) -->
+  <!-- Firebase Web Modular SDK v10 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // ⚠️ استبدل البيانات دي ببيانات مشروع Firebase بتاعك
+    // إعدادات Firebase الخاصة بمشروعك
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyBpn_n4f5FXtb4EvbnVGAzVDG1sviEkhCE",
+      authDomain: "amrcou-67ba2.firebaseapp.com",
+      databaseURL: "https://amrcou-67ba2-default-rtdb.firebaseio.com", // رابط القاعدة الافتراضي
+      projectId: "amrcou-67ba2",
+      storageBucket: "amrcou-67ba2.firebasestorage.app",
+      messagingSenderId: "373408181807",
+      appId: "1:373408181807:web:1d5ebf8cfcedbb9aee60da",
+      measurementId: "G-M7MVH8FFPH"
     };
 
+    // تهيئة الفايربيس والقاعدة
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // قراءة البيانات من رابط الواتساب تلقائياً (مثال: ?ticket=1023&agent=Ahmed)
+    // استخراج بيانات التكت والموظف من رابط الواتساب (مثال: ?ticket=1023&agent=احمد)
     const urlParams = new URLSearchParams(window.location.search);
     const ticketId = urlParams.get('ticket') || 'غير محدد';
     const agentName = urlParams.get('agent') || 'غير محدد';
 
-    document.getElementById('ticketDisplay').innerText = ticketId !== 'غير محدد' ? `رقم التكت: #${ticketId}` : '';
+    if (ticketId !== 'غير محدد') {
+      document.getElementById('ticketDisplay').innerText = `رقم الطلب / التكت: #${ticketId}`;
+    }
 
-    // إرسال التقييم
+    // دالة حفظ التقييم
     window.submitFeedback = async function () {
       const rating = document.querySelector('input[name="rating"]:checked')?.value;
       const mainIssue = document.getElementById('mainIssue').value;
       const suggestion = document.getElementById('suggestion').value.trim();
 
       if (!rating) {
-        alert("يرجى اختيار تقييم بالنجوم أولاً ⭐️");
+        alert("لطفاً، اختر التقييم بالنجوم أولاً ⭐️");
         return;
       }
 
@@ -52,7 +56,7 @@
       try {
         const feedbackRef = ref(db, 'feedbacks');
         const newFeedbackRef = push(feedbackRef);
-        
+
         await set(newFeedbackRef, {
           ticketId: ticketId,
           agentName: agentName,
@@ -62,12 +66,12 @@
           timestamp: new Date().toISOString()
         });
 
-        // إظهار شاشة النجاح
+        // تحويل للشاشة النهائية
         document.getElementById('feedbackForm').classList.add('hidden');
         document.getElementById('successState').classList.remove('hidden');
       } catch (error) {
-        console.error("Error saving feedback:", error);
-        alert("حدث خطأ أثناء إرسال التقييم، يرجى المحاولة لاحقاً.");
+        console.error("خطأ في حفظ البيانات:", error);
+        alert("حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.");
         submitBtn.disabled = false;
         submitBtn.innerText = "إرسال التقييم";
       }
@@ -75,16 +79,15 @@
   </script>
 
   <style>
-    /* تنسيق النجوم لتكون تفاعلية وسهلة على الموبايل */
     .star-rating {
       display: flex;
       flex-direction: row-reverse;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
     .star-rating input { display: none; }
     .star-rating label {
-      font-size: 2.5rem;
+      font-size: 2.8rem;
       color: #cbd5e1;
       cursor: pointer;
       transition: color 0.2s ease-in-out;
@@ -100,22 +103,22 @@
 
   <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 w-full max-w-lg border border-slate-200">
     
-    <!-- الهيدر -->
+    <!-- رأس الصفحة -->
     <div class="text-center mb-6">
-      <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 text-blue-600 rounded-full mb-3">
+      <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-100 text-blue-600 rounded-full mb-3 text-2xl">
         🌐
       </div>
       <h1 class="text-2xl font-bold text-slate-800">تقييم خدمة الدعم الفني</h1>
-      <p class="text-sm text-slate-500 mt-1">رأيك يهمنا لتطوير وتحسين جودة الخدمة</p>
+      <p class="text-sm text-slate-500 mt-1">رأيك يهمنا جداً لتطوير وتحسين جودة الخدمة</p>
       <span id="ticketDisplay" class="inline-block mt-2 text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full"></span>
     </div>
 
-    <!-- نموذج التقييم -->
+    <!-- فورم التقييم -->
     <form id="feedbackForm" onsubmit="event.preventDefault(); submitFeedback();" class="space-y-6">
       
-      <!-- 1. التقييم بالنجوم -->
+      <!-- النجوم -->
       <div>
-        <label class="block text-center text-sm font-medium text-slate-700 mb-2">كيف تقيم تجربتك مع الدعم اليوم؟</label>
+        <label class="block text-center text-sm font-medium text-slate-700 mb-2">ما هو تقييمك لمستوى الخدمة اليوم؟</label>
         <div class="star-rating">
           <input type="radio" id="star5" name="rating" value="5" /><label for="star5">★</label>
           <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
@@ -125,11 +128,11 @@
         </div>
       </div>
 
-      <!-- 2. نوع المشكلة التي واجهتك -->
+      <!-- اختيار أهم مشكلة -->
       <div>
         <label for="mainIssue" class="block text-sm font-medium text-slate-700 mb-2">أبرز مشكلة واجهتك (إن وجدت):</label>
         <select id="mainIssue" class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="لا توجد مشكلة">لم تواجهني مشكلة (كل شيء ممتاز)</option>
+          <option value="لا توجد مشكلة">لم تواجهني أي مشكلة (ممتاز)</option>
           <option value="بطء الإنترنت">بطء في سرعة الإنترنت</option>
           <option value="انقطاع الخدمة">انقطاع متكرر للخدمة</option>
           <option value="إعدادات الراوتر">مشكلة في إعدادات الراوتر/الواي فاي</option>
@@ -138,10 +141,10 @@
         </select>
       </div>
 
-      <!-- 3. الاقتراحات -->
+      <!-- مربع الاقتراحات -->
       <div>
         <label for="suggestion" class="block text-sm font-medium text-slate-700 mb-2">اقتراحك لتطوير الخدمة أو حل المشكلة:</label>
-        <textarea id="suggestion" rows="3" placeholder="اكتب اقتراحك أو انطباعك هنا بحرية..." class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+        <textarea id="suggestion" rows="3" placeholder="اكتب ملاحظاتك واقتراحاتك هنا بحرية..." class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
       </div>
 
       <!-- زر الإرسال -->
@@ -151,11 +154,11 @@
 
     </form>
 
-    <!-- شاشة التأكيد بعد الإرسال -->
+    <!-- رسالة النجاح -->
     <div id="successState" class="hidden text-center py-8">
       <div class="text-5xl mb-4">🎉</div>
       <h2 class="text-xl font-bold text-slate-800 mb-2">شكراً لتقييمك ووقتك!</h2>
-      <p class="text-sm text-slate-600">ملاحظاتك واقتراحاتك محل اهتمام وستساعدنا في تقديم خدمة أفضل دائماً.</p>
+      <p class="text-sm text-slate-600">ملاحظاتك وصلت للإدارة وستساعدنا في تقديم خدمة أفضل دائماً.</p>
     </div>
 
   </div>
