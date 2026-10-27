@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - تقييمات الخدمة والدعم</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Firebase Web Modular SDK v10 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpn_n4f5FXtb4EvbnVGAzVDG1sviEkhCE",
+      authDomain: "amrcou-67ba2.firebaseapp.com",
+      databaseURL: "https://amrcou-67ba2-default-rtdb.firebaseio.com",
+      projectId: "amrcou-67ba2",
+      storageBucket: "amrcou-67ba2.firebasestorage.app",
+      messagingSenderId: "373408181807",
+      appId: "1:373408181807:web:1d5ebf8cfcedbb9aee60da",
+      measurementId: "G-M7MVH8FFPH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // الاستماع للتقييمات وتحديث Dashboard لحظياً (Realtime)
+    const feedbackRef = ref(db, 'feedbacks');
+    onValue(feedbackRef, (snapshot) => {
+      const data = snapshot.val();
+      const listContainer = document.getElementById('feedbackList');
+      listContainer.innerHTML = '';
+
+      if (!data) {
+        document.getElementById('totalFeedbacks').innerText = '0';
+        document.getElementById('avgRating').innerText = '0.0';
+        listContainer.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">لا توجد تقييمات مسجلة حتى الآن</td></tr>`;
+        return;
+      }
+
+      const items = Object.values(data).reverse(); // أحدث التقييمات في الأعلى
+      let totalRating = 0;
+
+      items.forEach(item => {
+        totalRating += item.rating;
+
+        const dateFormatted = new Date(item.timestamp).toLocaleString('ar-EG', {
+          dateStyle: 'short',
+          timeStyle: 'short'
+        });
+
+        const row = document.createElement('tr');
+        row.className = "border-b border-slate-100 hover:bg-slate-50 transition";
+
+        row.innerHTML = `
+          <td class="p-4 font-semibold text-slate-700">#${item.ticketId || '-'}</td>
+          <td class="p-4 text-slate-600">${item.agentName || 'غير محدد'}</td>
+          <td class="p-4">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${getRatingBadge(item.rating)}">
+              ${item.rating} ★
+            </span>
+          </td>
+          <td class="p-4 text-slate-600 font-medium">${item.mainIssue || '-'}</td>
+          <td class="p-4 text-slate-600 max-w-xs truncate">${item.suggestion || '<span class="text-slate-300">لا يوجد</span>'}</td>
+          <td class="p-4 text-xs text-slate-400" dir="ltr">${dateFormatted}</td>
+        `;
+
+        listContainer.appendChild(row);
+      });
+
+      // تحديث كروت الأرقام والإحصائيات
+      document.getElementById('totalFeedbacks').innerText = items.length;
+      document.getElementById('avgRating').innerText = (totalRating / items.length).toFixed(1);
+    });
+
+    function getRatingBadge(rating) {
+      if (rating >= 4) return "bg-green-100 text-green-700";
+      if (rating === 3) return "bg-yellow-100 text-yellow-700";
+      return "bg-red-100 text-red-700";
+    }
+  </script>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans p-6">
+
+  <div class="max-w-6xl mx-auto space-y-6">
+    
+    <!-- الهيدر الرئيسي -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">لوحة تحكم تقييمات العملاء</h1>
+        <p class="text-sm text-slate-500 mt-1">متابعة لحظية لرضا العملاء واقتراحات جودة الخدمة</p>
+      </div>
+      <div class="flex gap-4">
+        <!-- كارت إجمالي التقييمات -->
+        <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl text-center min-w-[120px]">
+          <span class="block text-2xl font-bold text-blue-600" id="totalFeedbacks">0</span>
+          <span class="text-xs font-semibold text-blue-800">إجمالي التقييمات</span>
+        </div>
+        <!-- كارت متوسط التقييم -->
+        <div class="bg-amber-50 border border-amber-100 p-4 rounded-xl text-center min-w-[120px]">
+          <span class="block text-2xl font-bold text-amber-600" id="avgRating">0.0</span>
+          <span class="text-xs font-semibold text-amber-800">متوسط النجوم</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- جدول عرض البيانات -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-100">
+        <h2 class="text-lg font-bold text-slate-800">أحدث أفكار وتقييمات العملاء</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-right border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase tracking-wider border-b border-slate-200">
+              <th class="p-4">رقم التكت</th>
+              <th class="p-4">موظف الدعم</th>
+              <th class="p-4">التقييم</th>
+              <th class="p-4">المشكلة الرئيسية</th>
+              <th class="p-4">الاقتراح / الملاحظة</th>
+              <th class="p-4">التاريخ والوقت</th>
+            </tr>
+          </thead>
+          <tbody id="feedbackList" class="text-sm divide-y divide-slate-100">
+            <!-- الداتا هتظهر هنا تلقائياً -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
