@@ -29,24 +29,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // استخراج بيانات التكت، الموظف، واسم العميل من رابط الواتساب
-    // مثال: ?ticket=5001&agent=محمد&name=علي
+    // استخراج بيانات التكت والموظف من رابط الواتساب (مثال: ?ticket=5001&agent=محمد)
     const urlParams = new URLSearchParams(window.location.search);
     const ticketId = urlParams.get('ticket') || 'غير محدد';
     const agentName = urlParams.get('agent') || 'غير محدد';
-    const customerName = urlParams.get('name') || 'عميلنا العزيز';
 
-    // عرض اسم العميل ورقم التكت في الهيدر
-    document.getElementById('customerWelcome').innerText = `أهلاً بك، ${customerName}`;
     if (ticketId !== 'غير محدد') {
       document.getElementById('ticketDisplay').innerText = `رقم الطلب / التكت: #${ticketId}`;
     }
 
     // دالة حفظ التقييم
     window.submitFeedback = async function () {
+      const customerName = document.getElementById('customerName').value.trim();
       const rating = document.querySelector('input[name="rating"]:checked')?.value;
       const mainIssue = document.getElementById('mainIssue').value;
       const suggestion = document.getElementById('suggestion').value.trim();
+
+      if (!customerName) {
+        alert("لطفاً، اكتب اسمك الكريم أولاً ✍️");
+        document.getElementById('customerName').focus();
+        return;
+      }
 
       if (!rating) {
         alert("لطفاً، اختر التقييم بالنجوم أولاً ⭐️");
@@ -113,14 +116,20 @@
       <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-100 text-blue-600 rounded-full mb-3 text-2xl">
         🌐
       </div>
-      <h1 id="customerWelcome" class="text-2xl font-bold text-slate-800">تقييم خدمة الدعم الفني</h1>
+      <h1 class="text-2xl font-bold text-slate-800">تقييم خدمة الدعم الفني</h1>
       <p class="text-sm text-slate-500 mt-1">رأيك يهمنا جداً لتطوير وتحسين جودة الخدمة</p>
       <span id="ticketDisplay" class="inline-block mt-2 text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full"></span>
     </div>
 
     <!-- فورم التقييم -->
-    <form id="feedbackForm" onsubmit="event.preventDefault(); submitFeedback();" class="space-y-6">
+    <form id="feedbackForm" onsubmit="event.preventDefault(); submitFeedback();" class="space-y-5">
       
+      <!-- إدخال اسم العميل -->
+      <div>
+        <label for="customerName" class="block text-sm font-medium text-slate-700 mb-1">اسمك الكريم:</label>
+        <input type="text" id="customerName" placeholder="اكتب اسمك هنا..." required class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+      </div>
+
       <!-- النجوم -->
       <div>
         <label class="block text-center text-sm font-medium text-slate-700 mb-2">ما هو تقييمك لمستوى الخدمة اليوم؟</label>
@@ -135,8 +144,8 @@
 
       <!-- اختيار أهم مشكلة -->
       <div>
-        <label for="mainIssue" class="block text-sm font-medium text-slate-700 mb-2">أبرز مشكلة واجهتك (إن وجدت):</label>
-        <select id="mainIssue" class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <label for="mainIssue" class="block text-sm font-medium text-slate-700 mb-1">أبرز مشكلة واجهتك (إن وجدت):</label>
+        <select id="mainIssue" class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
           <option value="لا توجد مشكلة">لم تواجهني أي مشكلة (ممتاز)</option>
           <option value="بطء الإنترنت">بطء في سرعة الإنترنت</option>
           <option value="انقطاع الخدمة">انقطاع متكرر للخدمة</option>
@@ -148,7 +157,7 @@
 
       <!-- مربع الاقتراحات -->
       <div>
-        <label for="suggestion" class="block text-sm font-medium text-slate-700 mb-2">اقتراحك لتطوير الخدمة أو حل المشكلة:</label>
+        <label for="suggestion" class="block text-sm font-medium text-slate-700 mb-1">اقتراحك لتطوير الخدمة أو حل المشكلة:</label>
         <textarea id="suggestion" rows="3" placeholder="اكتب ملاحظاتك واقتراحاتك هنا بحرية..." class="w-full p-3 border border-slate-300 rounded-xl bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
       </div>
 
