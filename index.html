@@ -29,14 +29,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // استخراج بيانات التكت والموظف من رابط الواتساب (مثال: ?ticket=5001&agent=محمد)
-    const urlParams = new URLSearchParams(window.location.search);
-    const ticketId = urlParams.get('ticket') || 'غير محدد';
-    const agentName = urlParams.get('agent') || 'غير محدد';
+    // توليد رقم تكت تلقائي وفريد للعميل (مثال: T-849201)
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const ticketId = `T-${Date.now().toString().slice(-4)}${randomNum}`;
 
-    if (ticketId !== 'غير محدد') {
-      document.getElementById('ticketDisplay').innerText = `رقم الطلب / التكت: #${ticketId}`;
-    }
+    // إظهار رقم التكت التلقائي في الصفحة
+    document.getElementById('ticketDisplay').innerText = `رقم التكت: #${ticketId}`;
 
     // دالة حفظ التقييم
     window.submitFeedback = async function () {
@@ -67,7 +65,7 @@
         await set(newFeedbackRef, {
           customerName: customerName,
           ticketId: ticketId,
-          agentName: agentName,
+          agentName: "دعم الواتساب", // اسم افتراضي لأن الرابط ثابت
           rating: parseInt(rating),
           mainIssue: mainIssue,
           suggestion: suggestion,
@@ -118,7 +116,7 @@
       </div>
       <h1 class="text-2xl font-bold text-slate-800">تقييم خدمة الدعم الفني</h1>
       <p class="text-sm text-slate-500 mt-1">رأيك يهمنا جداً لتطوير وتحسين جودة الخدمة</p>
-      <span id="ticketDisplay" class="inline-block mt-2 text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full"></span>
+      <span id="ticketDisplay" class="inline-block mt-2 text-xs font-semibold bg-blue-50 text-blue-600 px-3 py-1 rounded-full border border-blue-100"></span>
     </div>
 
     <!-- فورم التقييم -->
