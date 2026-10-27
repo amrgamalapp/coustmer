@@ -17,7 +17,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyBpn_n4f5FXtb4EvbnVGAzVDG1sviEkhCE",
       authDomain: "amrcou-67ba2.firebaseapp.com",
-      databaseURL: "https://amrcou-67ba2-default-rtdb.firebaseio.com", // رابط القاعدة الافتراضي
+      databaseURL: "https://amrcou-67ba2-default-rtdb.firebaseio.com",
       projectId: "amrcou-67ba2",
       storageBucket: "amrcou-67ba2.firebasestorage.app",
       messagingSenderId: "373408181807",
@@ -29,11 +29,15 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // استخراج بيانات التكت والموظف من رابط الواتساب (مثال: ?ticket=1023&agent=احمد)
+    // استخراج بيانات التكت، الموظف، واسم العميل من رابط الواتساب
+    // مثال: ?ticket=5001&agent=محمد&name=علي
     const urlParams = new URLSearchParams(window.location.search);
     const ticketId = urlParams.get('ticket') || 'غير محدد';
     const agentName = urlParams.get('agent') || 'غير محدد';
+    const customerName = urlParams.get('name') || 'عميلنا العزيز';
 
+    // عرض اسم العميل ورقم التكت في الهيدر
+    document.getElementById('customerWelcome').innerText = `أهلاً بك، ${customerName}`;
     if (ticketId !== 'غير محدد') {
       document.getElementById('ticketDisplay').innerText = `رقم الطلب / التكت: #${ticketId}`;
     }
@@ -58,6 +62,7 @@
         const newFeedbackRef = push(feedbackRef);
 
         await set(newFeedbackRef, {
+          customerName: customerName,
           ticketId: ticketId,
           agentName: agentName,
           rating: parseInt(rating),
@@ -108,7 +113,7 @@
       <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-100 text-blue-600 rounded-full mb-3 text-2xl">
         🌐
       </div>
-      <h1 class="text-2xl font-bold text-slate-800">تقييم خدمة الدعم الفني</h1>
+      <h1 id="customerWelcome" class="text-2xl font-bold text-slate-800">تقييم خدمة الدعم الفني</h1>
       <p class="text-sm text-slate-500 mt-1">رأيك يهمنا جداً لتطوير وتحسين جودة الخدمة</p>
       <span id="ticketDisplay" class="inline-block mt-2 text-xs font-semibold bg-slate-100 text-slate-600 px-3 py-1 rounded-full"></span>
     </div>
